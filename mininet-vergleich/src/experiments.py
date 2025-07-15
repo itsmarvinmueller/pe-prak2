@@ -57,3 +57,13 @@ def run_experiment(queue_size=100, udp_bandwidth=15, test_duration=30, iteration
     info(f"    - Results saved in {result_path}\n")
 
     return result_path
+
+if __name__ == "__main__":
+    # Beispielaufruf mit Standardwerten
+    run_experiment(
+        queue_size=100,
+        udp_bandwidth=15,
+        test_duration=30,
+        iteration=1,
+        result_base_path='./results/tcp_udp_fairness'
+    )
