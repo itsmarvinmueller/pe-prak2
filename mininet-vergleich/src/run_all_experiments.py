@@ -11,7 +11,7 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 def run_experiment(script, udp_bandwidth, protocol, iteration):
     print(f"Starte {protocol}-Experiment mit UDP-Bandbreite {udp_bandwidth} Mbit/s, Iteration {iteration} ...")
     subprocess.run([
-        'python', script,
+        'python3', script,
         '--udp_bandwidth', str(udp_bandwidth),
         '--result_base_path', f'./results/{protocol}',
         '--iteration', str(iteration)
