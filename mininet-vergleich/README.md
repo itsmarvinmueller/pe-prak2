@@ -36,6 +36,27 @@ Um die Experimente durchzuführen, verwenden Sie die folgenden Befehle:
   python src/dctcp_experiments.py
   ```
 
+## Automatisierte Experimente und Plotten
+
+Um für verschiedene UDP-Bandbreiten die Latenz und den Durchsatz von TCP und DCTCP zu messen und zu vergleichen, gehen Sie wie folgt vor:
+
+1. Führen Sie die Experimente für alle gewünschten UDP-Bandbreiten durch:
+   ```
+   python src/experiments.py --all
+   python src/dctcp_experiments.py --all
+   ```
+
+   *(Die Option `--all` sorgt dafür, dass für eine feste Menge an UDP-Bandbreiten die Messungen automatisiert durchgeführt werden. Passen Sie dies ggf. an Ihre Implementierung an.)*
+
+2. Plotten Sie die Ergebnisse:
+   ```
+   python src/plot_results.py
+   ```
+
+   *(Das Skript `plot_results.py` liest die gespeicherten Messdaten und erstellt Vergleichsplots für Latenz und Durchsatz von TCP und DCTCP in Abhängigkeit von der UDP-Bandbreite.)*
+
+Die Plots werden im Ordner `plots/` gespeichert.
+
 ## Ergebnisse
 
 Die Ergebnisse der Experimente werden in den entsprechenden Verzeichnissen gespeichert. Sie können die Ergebnisse analysieren, um die Leistung von TCP und DCTCP zu vergleichen und die Auswirkungen von Latenz und Paketverlust zu verstehen.
