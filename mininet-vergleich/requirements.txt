@@ -1,0 +1,5 @@
+mininet==2.3.0
+iperf3==3.10.1
+numpy==1.21.0
+matplotlib==3.4.3
+scipy==1.7.1
