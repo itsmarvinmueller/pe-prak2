@@ -5,7 +5,7 @@ import statistics
 
 UDP_BANDWIDTHS = [1, 5, 10, 15, 20, 25, 30]  # Mbit/s
 RESULTS_DIR = './results/summary'
-NUM_RUNS = 50
+NUM_RUNS = 20
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def run_experiment(script, udp_bandwidth, protocol, iteration):
@@ -56,32 +56,31 @@ def collect_results(protocol, udp_bandwidth, iteration):
 
     return result
 
-def average_results(results):
-    avg = {}
-    for key in ['tcp_throughput', 'tcp_latency', 'udp_loss_percent']:
-        values = [r[key] for r in results if r[key] is not None]
-        avg[key] = statistics.mean(values) if values else None
-    return avg
+def save_iteration_result(protocol, udp_bw, iteration, result):
+    # Speichere das Ergebnis jeder Iteration einzeln ab
+    filename = f'{protocol}_udp{udp_bw}_iter{iteration}.json'
+    filepath = os.path.join(RESULTS_DIR, filename)
+    with open(filepath, 'w') as f:
+        json.dump(result, f, indent=2)
 
 def main():
     all_results = []
     for udp_bw in UDP_BANDWIDTHS:
         for protocol, script in [('tcp_udp_fairness', 'src/experiments.py'), ('dctcp', 'src/dctcp_experiments.py')]:
-            run_results = []
             for i in range(1, NUM_RUNS + 1):
                 run_experiment(script, udp_bw, protocol, i)
                 result = collect_results(protocol, udp_bw, i)
-                run_results.append(result)
-            avg = average_results(run_results)
-            avg['udp_bandwidth'] = udp_bw
-            avg['protocol'] = protocol
-            all_results.append(avg)
-            print(f"Durchschnitt für {protocol} bei {udp_bw} Mbit/s: {avg}")
+                result['udp_bandwidth'] = udp_bw
+                result['protocol'] = protocol
+                result['iteration'] = i
+                save_iteration_result(protocol, udp_bw, i, result)
+                all_results.append(result)
+                print(f"Ergebnis für {protocol} bei {udp_bw} Mbit/s, Iteration {i}: {result}")
 
-    # Speichern
+    # Speichern aller Ergebnisse
     with open(os.path.join(RESULTS_DIR, 'all_results.json'), 'w') as f:
         json.dump(all_results, f, indent=2)
-    print("Alle Durchschnittswerte gespeichert.")
+    print("Alle Einzelwerte gespeichert.")
 
 if __name__ == "__main__":
     main()
