@@ -69,23 +69,39 @@ def save_iteration_result(protocol, udp_bw, iteration, result):
         json.dump(result, f, indent=2)
 
 def main():
-    all_results = []
+    summary_results = []
     for udp_bw in UDP_BANDWIDTHS:
-        for protocol, script in [('tcp_udp_fairness', 'src/experiments.py'), ('dctcp', 'src/dctcp_experiments.py')]:
+        for protocol, script in [('dctcp', 'src/dctcp_experiments.py'), ('tcp_udp_fairness', 'src/experiments.py')]:
+            latencies = []
+            throughputs = []
+            udp_losses = []
             for i in range(1, NUM_RUNS + 1):
                 run_experiment(script, udp_bw, protocol, i)
                 result = collect_results(protocol, udp_bw, i)
-                result['udp_bandwidth'] = udp_bw
-                result['protocol'] = protocol
-                result['iteration'] = i
-                save_iteration_result(protocol, udp_bw, i, result)
-                all_results.append(result)
-                print(f"Ergebnis für {protocol} bei {udp_bw} Mbit/s, Iteration {i}: {result}")
+                if result['tcp_latency'] is not None:
+                    latencies.append(result['tcp_latency'])
+                if result['tcp_throughput'] is not None:
+                    throughputs.append(result['tcp_throughput'])
+                if result['udp_loss_percent'] is not None:
+                    udp_losses.append(result['udp_loss_percent'])
+            avg_latency = statistics.mean(latencies) if latencies else None
+            avg_throughput = statistics.mean(throughputs) if throughputs else None
+            avg_udp_loss = statistics.mean(udp_losses) if udp_losses else None
+            summary = {
+                'udp_bandwidth': udp_bw,
+                'protocol': protocol,
+                'avg_latency': avg_latency,
+                'avg_throughput': avg_throughput,
+                'avg_udp_loss_percent': avg_udp_loss,
+                'num_iterations': NUM_RUNS
+            }
+            summary_results.append(summary)
+            print(f"Durchschnitt für {protocol} bei {udp_bw} Mbit/s: {summary}")
 
-    # Speichern aller Ergebnisse
-    with open(os.path.join(RESULTS_DIR, 'all_results.json'), 'w') as f:
-        json.dump(all_results, f, indent=2)
-    print("Alle Einzelwerte gespeichert.")
+    # Speichern der Durchschnittswerte
+    with open(os.path.join(RESULTS_DIR, 'summary_results.json'), 'w') as f:
+        json.dump(summary_results, f, indent=2)
+    print("Alle Durchschnittswerte gespeichert.")
 
 if __name__ == "__main__":
     main()
