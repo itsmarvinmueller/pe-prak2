@@ -10,6 +10,11 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def run_experiment(script, udp_bandwidth, protocol, iteration):
     print(f"Starte {protocol}-Experiment mit UDP-Bandbreite {udp_bandwidth} Mbit/s, Iteration {iteration} ...")
+    # TCP-Algorithmus setzen, falls dctcp verwendet wird
+    if protocol == "dctcp":
+        subprocess.run(['sudo', 'sysctl', '-w', 'net.ipv4.tcp_congestion_control=dctcp'], check=True)
+    elif protocol == "tcp_udp_fairness":
+        subprocess.run(['sudo', 'sysctl', '-w', 'net.ipv4.tcp_congestion_control=reno'], check=True)
     subprocess.run([
         'python3', script,
         '--udp_bandwidth', str(udp_bandwidth),
