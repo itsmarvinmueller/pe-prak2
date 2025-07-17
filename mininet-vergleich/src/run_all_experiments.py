@@ -66,7 +66,8 @@ def save_iteration_result(protocol, udp_bw, iteration, result):
 def main():
     summary_results = []
     for udp_bw in UDP_BANDWIDTHS:
-        for protocol, script in [('dctcp', 'src/dctcp_experiments.py'), ('tcp_udp_fairness', 'src/experiments.py')]:
+        # Nur TCP-Experiment ausführen
+        for protocol, script in [('tcp_udp_fairness', 'src/experiments.py')]:
             latencies = []
             throughputs = []
             udp_losses = []
