@@ -36,11 +36,16 @@ def collect_results(protocol, udp_bandwidth, iteration):
     if os.path.exists(ping_log):
         with open(ping_log) as f:
             lines = f.readlines()
+            # Prüfe, ob mindestens ein Ping erfolgreich war
+            latency_found = False
             for line in lines:
                 if 'rtt min/avg/max/mdev' in line:
                     avg = line.split('=')[1].split('/')[1]
                     result['tcp_latency'] = float(avg)
+                    latency_found = True
                     break
+            if not latency_found:
+                result['tcp_latency'] = None
     else:
         result['tcp_latency'] = None
 
@@ -66,7 +71,6 @@ def save_iteration_result(protocol, udp_bw, iteration, result):
 def main():
     summary_results = []
     for udp_bw in UDP_BANDWIDTHS:
-        # Nur TCP-Experiment ausführen
         for protocol, script in [('tcp_udp_fairness', 'src/experiments.py')]:
             latencies = []
             throughputs = []
@@ -93,6 +97,10 @@ def main():
             }
             summary_results.append(summary)
             print(f"Durchschnitt für {protocol} bei {udp_bw} Mbit/s: {summary}")
+            print(f"Durchschnittslatenz für UDP-Bandbreite {udp_bw}: {avg_latency} ms")
+
+        # Nach jedem UDP-Bandbreiten-Durchlauf Plot generieren
+        subprocess.run(['python3', 'src/plot_results.py'])
 
     # Speichern der Durchschnittswerte
     with open(os.path.join(RESULTS_DIR, 'summary_results.json'), 'w') as f:
