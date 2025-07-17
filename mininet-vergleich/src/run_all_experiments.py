@@ -5,7 +5,7 @@ import statistics
 
 UDP_BANDWIDTHS = [1, 5, 10, 15, 20, 25, 30]  # Mbit/s
 RESULTS_DIR = './results/summary'
-NUM_RUNS = 20
+NUM_RUNS = 5
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def run_experiment(script, udp_bandwidth, protocol, iteration):
